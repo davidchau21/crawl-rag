@@ -1,0 +1,396 @@
+{
+  "name": "Chatbot AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        1040
+      ],
+      "id": "a3d383c9-4139-44ef-ba5b-d88764451fed",
+      "name": "Webhook",
+      "webhookId": "b4428dba-05cb-4c69-b6ba-3646e5338204",
+      "credentials": {
+        "jwtAuth": {
+          "id": "FATvPMOlIMXweq1C",
+          "name": "JWT Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        3920,
+        1040
+      ],
+      "id": "cb876902-a3fd-4dc7-b689-0a6c882ae0f2",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9051b86c-4287-4e9c-a802-588161717f89",
+              "name": "output",
+              "value": "Bạn đã vượt quá giới hạn tin nhắn, vui lòng thử lại vào hôm sau",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1620,
+        1520
+      ],
+      "id": "b7757a40-828d-4bf2-9ac6-fc7fc1d9b5e9",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CALL test.update_device_chat_count('{{ $json.headers[\"device-id\"] }}',null, 100,null);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        -240,
+        1040
+      ],
+      "id": "3fdd5419-cf54-4044-b907-1f6bdabb2c51",
+      "name": "Postgres",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false,
+      "credentials": {
+        "postgres": {
+          "id": "yKx7cJ1W5cccgxwE",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Webhook').item.json.body.chatInput }}",
+        "options": {
+          "systemMessage": "Use tool \"company_knowledge_base\" if question relative about my company is name Wiintek, Tòn Nguyen.\nAlways use tool \"getinfoongoogle\" if not found results"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1740,
+        980
+      ],
+      "id": "e49ddd39-73f0-44b4-915e-1dcdac49c152",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Postgres').item.json.p_result.device_id }}",
+        "tableName": "test.n8n_chat_histories",
+        "contextWindowLength": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1620,
+        1260
+      ],
+      "id": "6a961418-cf50-46c8-9608-0cfd8c075cf5",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "yKx7cJ1W5cccgxwE",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        1220
+      ],
+      "id": "ac8bc310-8ee1-431e-bba4-9be74813addc",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ST3XZpACMuHTll0i",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "company_knowledge_base",
+        "description": "Work with your database Postgres"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        1200
+      ],
+      "id": "56a5ddd9-09ec-4a78-b1d2-cbb8eb2cc556",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        1340
+      ],
+      "id": "639e336c-0f2d-4554-8b14-107bc235ae21",
+      "name": "Postgres PGVector Store2",
+      "credentials": {
+        "postgres": {
+          "id": "yKx7cJ1W5cccgxwE",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        1380
+      ],
+      "id": "30b9c259-c338-41fd-b705-f2169efc9850",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ST3XZpACMuHTll0i",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1740,
+        1460
+      ],
+      "id": "d7e08ffa-44ef-41bb-b9d5-6d7caf7742ba",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "8D8dz7MEh44SzAjx",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "dev-workflow.aquanets.com",
+            "user-agent": "axios/1.8.1",
+            "content-length": "41",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "authorization": "Bearer eyJraWQiOiIwMmFkNjkzYi1lMmIwLTRlNzYtYjE2Zi01YTNiMzY0YTNhNGMiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI2NmIxZDUwZTc5N2RlYWZhZDgxYTVhNmYiLCJuYmYiOjE3Mzk4OTI1NTgsImlzcyI6ImFxdWFuZXRzLmNvbSIsImNoYW5uZWwiOiJDTElFTlQiLCJleHAiOjE3NDI0ODQ1NTgsImlhdCI6MTczOTg5MjU1OCwianRpIjoiNjdiNGE3NGVjY2MwNWUzZjAwOTE2YzQ2In0.FYf2k6OWzvpcjo0N-liPM8O8FAKl8GFLGzg4NLwGaEq_ZUG67VoyfwDuUqBP-4CmjraWopH6ccpvu__wP2kJdX1gv0gmX83GJc60mxN3o703V9iRTur8T_Qhwr7FxFBX7A3wNctU_tBQnkj-IgLxS7cgepJpdmUeW3ruOPzzLH4oLu7wa3wSv-2ktj3FliFeEz8OsBFi0lPY36Ow2GLgv0-eOztbiQ-5L8wbHyGo0s3S_0YweAxYh9mwIq9qImY8wcCqTNmGfXESi3gqvrMSVHSRkWXT0l_NgkFqMkOpSb7ExQ-dDv1-cjltIUy-CFZCxm0GWDc_Oro_RsjqdojJFQ",
+            "cdn-loop": "cloudflare; loops=1",
+            "cf-connecting-ip": "203.171.28.206",
+            "cf-ipcountry": "VN",
+            "cf-ray": "91d91b87cb5cfdf2-SIN",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "content-type": "application/json",
+            "device-id": "WEB-d520c7a8-421b-4563-b955-f5abc56b97ec",
+            "prioritizeauthorization": "true",
+            "sessionid": "bae84744-eff0-46eb-943b-e0dc1b711e1a",
+            "x-forwarded-for": "10.100.119.64",
+            "x-forwarded-host": "dev-workflow.aquanets.com",
+            "x-forwarded-port": "80",
+            "x-forwarded-proto": "http",
+            "x-forwarded-server": "traefik-6cffdf899-nl5zp",
+            "x-real-ip": "10.100.119.64"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "chatInput": "Công ty bạn làm gì"
+          },
+          "webhookUrl": "https://dev-workflow.aquanets.com/webhook/chat",
+          "executionMode": "production",
+          "jwtPayload": {
+            "sub": "66b1d50e797deafad81a5a6f",
+            "nbf": 1739892558,
+            "iss": "aquanets.com",
+            "channel": "CLIENT",
+            "exp": 1742484558,
+            "iat": 1739892558,
+            "jti": "67b4a74eccc05e3f00916c46"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store2": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e27a549a-9130-48a0-9a7b-99d8fe36c7c6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d705a2206854813cd9b5b11199bc8d25018960a84fc2001f402e13fc72bfca0b"
+  },
+  "id": "JAP9FhjN7HqLwXux",
+  "tags": []
+}

@@ -1,0 +1,388 @@
+{
+  "name": "MCP Agent Scrape webpage",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=scrape this page {{ $json.url }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=## Vai trò:\nVới vai trò là một copywriter\n\n## Quy tắc đầu ra:\n- Giữ nguyên nội dung\n- Bài viết trình bày dưới dạng markdown chuẩn.\n- Tiêu đề bài viết được tô đậm bằng ký hiệu Markdown (**).\n- Xóa bỏ tất cả các hình ảnh HTML.\n- Tất cả các đoạn `\\n` hoặc `\\n\\n` phải được thay bằng dấu xuống dòng thực sự (`\\n`) trong markdown.\n- Không sử dụng bất kỳ ký tự thoát dòng nào, mà phải tạo ra dòng mới thực tế."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        220,
+        780
+      ],
+      "id": "43cb209f-5b2f-4e8d-8cbc-91e0f1738e14",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://n8n-demo.agent68.xyz/mcp/d503b381-402a-4246-91c7-10d8b3d2ca12/sse"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        380,
+        1000
+      ],
+      "id": "fd717a8c-2a8b-4780-ba1d-fd4db2c182e7",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        180,
+        1000
+      ],
+      "id": "6e2b233c-c2b1-4402-9ce8-96d39a6d6d88",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "zXvqNqmp7E8seuzz",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -300,
+        620
+      ],
+      "id": "f4dac3ae-a933-49eb-b7d2-8ee27b6dd931",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "id": "9db22f11-97df-4011-ac24-0f4587797c44",
+      "name": "Get HTML data",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        200,
+        320
+      ],
+      "typeVersion": 4.1
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": "h1.title-detail"
+            },
+            {
+              "key": "content",
+              "cssSelector": "article.fck_detail",
+              "returnValue": "html"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1396b673-61f8-42d1-9949-f421dc3636b6",
+      "name": "Extract Data",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        360,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.title }}\\n{{ $json.content }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=## Vai trò\nVới vai trò là một copywriter\n\n## Quy tắc đầu ra:\n- Giữ nguyên nội dung\n- Bài viết trình bày dưới dạng markdown chuẩn.\n- Tiêu đề bài viết được tô đậm bằng ký hiệu Markdown (**).\n- Xóa bỏ tất cả các hình ảnh HTML.\n- Tất cả các đoạn `\\n` hoặc `\\n\\n` phải được thay bằng dấu xuống dòng thực sự (`\\n`) trong markdown.\n- Không sử dụng bất kỳ ký tự thoát dòng nào, mà phải tạo ra dòng mới thực tế."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        560,
+        320
+      ],
+      "id": "26d1dfc5-2a8b-4a9a-be6d-e76724966469",
+      "name": "Basic LLM Chain2",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        920,
+        320
+      ],
+      "id": "a90fc947-4d7f-4eed-a4b3-9bc6aad86a62",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9370402c-4a40-4ab3-9b2e-17ab91e31a8e",
+              "name": "url",
+              "value": "https://vnexpress.net/tong-bi-thu-viet-nam-du-suc-vuot-qua-thach-thuc-4875205.html",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        620
+      ],
+      "id": "16f2ba26-4eea-4276-84fa-7d58202b08cf",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.output }}",
+        "options": {
+          "completeHTMLDocument": false
+        }
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        920,
+        780
+      ],
+      "id": "a6a0b46c-4ea5-47d4-84a4-19011f8b595e",
+      "name": "Markdown1"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n\n<html>\n<head>\n  <meta charset=\"UTF-8\" />\n  <title>My HTML document</title>\n</head>\n<body>\n{{ $json.data }}\n</body>\n</html>\n\n<style>\n.container {\n  background-color: #ffffff;\n  text-align: center;\n  padding: 16px;\n  border-radius: 8px;\n}\n\nh1 {\n  color: #ff6d5a;\n  font-size: 24px;\n  font-weight: bold;\n  padding: 8px;\n}\n\nh2 {\n  color: #909399;\n  font-size: 18px;\n  font-weight: bold;\n  padding: 8px;\n}\n</style>\n\n<script>\nconsole.log(\"Hello World!\");\n</script>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        780
+      ],
+      "id": "ff21db91-1626-4d0b-b9d5-d624635ad8c6",
+      "name": "HTML-Firecrawl",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n\n<html>\n<head>\n  <meta charset=\"UTF-8\" />\n  <title>My HTML document</title>\n</head>\n<body>\n{{ $json.data }}\n</body>\n</html>\n\n<style>\n.container {\n  background-color: #ffffff;\n  text-align: center;\n  padding: 16px;\n  border-radius: 8px;\n}\n\nh1 {\n  color: #ff6d5a;\n  font-size: 24px;\n  font-weight: bold;\n  padding: 8px;\n}\n\nh2 {\n  color: #909399;\n  font-size: 18px;\n  font-weight: bold;\n  padding: 8px;\n}\n</style>\n\n<script>\nconsole.log(\"Hello World!\");\n</script>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        320
+      ],
+      "id": "92e428aa-3fa8-48eb-9281-7eb57304662a",
+      "name": "HTML-Extract Data",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "## Cách 1: Sử dụng Extract html Content",
+        "height": 420,
+        "width": 1180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        120,
+        260
+      ],
+      "id": "df0558b6-46fd-4de8-84f5-ac95a0f6114d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Cách 2: Sử dụng MCP fire crawl",
+        "height": 400,
+        "width": 1180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        120,
+        720
+      ],
+      "id": "20e0848b-a24d-4f78-ba6d-f9adc2c116ce",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get HTML data": {
+      "main": [
+        [
+          {
+            "node": "Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Data": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain2": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "HTML-Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get HTML data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Markdown1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown1": {
+      "main": [
+        [
+          {
+            "node": "HTML-Firecrawl",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "76273e8b-bdaa-4704-b533-944feb62d559",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "VQWYbTg8lTBlfTsi",
+  "tags": []
+}

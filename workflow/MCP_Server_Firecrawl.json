@@ -1,0 +1,225 @@
+{
+  "name": "MCP Server Firecrawl",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "d503b381-402a-4246-91c7-10d8b3d2ca12"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d1ead532-cbe5-4d28-9001-e23d3f12c026",
+      "name": "MCP Server Trigger",
+      "webhookId": "d503b381-402a-4246-91c7-10d8b3d2ca12"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Trích xuất thông tin từ URL được chỉ định và tất cả các trang con có thể truy cập, xuất ra nội dung từ mỗi trang.",
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v1/crawl",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "valueProvider": "fieldValue"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n        \"url\": \"{url}\",\n\t\t\"limit\": 5,\n\t\t\"scrapeOptions\": {\n\t\t\"formats\": [ \"html\" ]\n}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "url",
+              "description": "url website to crawl",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        40,
+        180
+      ],
+      "id": "a2cd5ede-85e6-4ca5-aca2-5e4c7c52bc6c",
+      "name": "crawl",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "ywS2uhFP7YD0GYAU",
+          "name": "Bearer Firecrawl"
+        },
+        "httpHeaderAuth": {
+          "id": "tgXfVMklOsObzTZu",
+          "name": "Header Auth Firecrawl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Trích xuất url tìm thấy tù URL được chỉ định",
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v1/map",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "valueProvider": "fieldValue"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n\"url\": \"{url}\",\n\"includeSubdomains\": true\n}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "url",
+              "description": "url website to get map",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        200
+      ],
+      "id": "0ed86291-8f1a-4dc5-ab0a-ed2633fe3322",
+      "name": "map",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "ywS2uhFP7YD0GYAU",
+          "name": "Bearer Firecrawl"
+        },
+        "httpHeaderAuth": {
+          "id": "tgXfVMklOsObzTZu",
+          "name": "Header Auth Firecrawl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Trích xuất thông tin từ URL đã chỉ định, không trích thông tin các trang con.",
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v1/scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "valueProvider": "fieldValue"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n\"url\": \"{url}\",\n\"formats\": [ \"markdown\" ]\n}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "url",
+              "description": "url website cần trích xuất thông tin",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        180
+      ],
+      "id": "72c688d9-06a3-426c-9340-539a5009456b",
+      "name": "scrape",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "ywS2uhFP7YD0GYAU",
+          "name": "Bearer Firecrawl"
+        },
+        "httpHeaderAuth": {
+          "id": "tgXfVMklOsObzTZu",
+          "name": "Header Auth Firecrawl"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "crawl": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "map": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "scrape": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bcfa4776-5657-45a7-a6e1-e40bceec4390",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "SwyYQ3VH6n9X4b5n",
+  "tags": []
+}
