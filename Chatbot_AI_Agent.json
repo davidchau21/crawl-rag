@@ -226,7 +226,7 @@
             "content-length": "41",
             "accept": "application/json, text/plain, */*",
             "accept-encoding": "gzip, br",
-            "authorization": "Bearer eyJraWQiOiIwMmFkNjkzYi1lMmIwLTRlNzYtYjE2Zi01YTNiMzY0YTNhNGMiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI2NmIxZDUwZTc5N2RlYWZhZDgxYTVhNmYiLCJuYmYiOjE3Mzk4OTI1NTgsImlzcyI6ImFxdWFuZXRzLmNvbSIsImNoYW5uZWwiOiJDTElFTlQiLCJleHAiOjE3NDI0ODQ1NTgsImlhdCI6MTczOTg5MjU1OCwianRpIjoiNjdiNGE3NGVjY2MwNWUzZjAwOTE2YzQ2In0.FYf2k6OWzvpcjo0N-liPM8O8FAKl8GFLGzg4NLwGaEq_ZUG67VoyfwDuUqBP-4CmjraWopH6ccpvu__wP2kJdX1gv0gmX83GJc60mxN3o703V9iRTur8T_Qhwr7FxFBX7A3wNctU_tBQnkj-IgLxS7cgepJpdmUeW3ruOPzzLH4oLu7wa3wSv-2ktj3FliFeEz8OsBFi0lPY36Ow2GLgv0-eOztbiQ-5L8wbHyGo0s3S_0YweAxYh9mwIq9qImY8wcCqTNmGfXESi3gqvrMSVHSRkWXT0l_NgkFqMkOpSb7ExQ-dDv1-cjltIUy-CFZCxm0GWDc_Oro_RsjqdojJFQ",
+            "authorization": "Bearer ...",
             "cdn-loop": "cloudflare; loops=1",
             "cf-connecting-ip": "203.171.28.206",
             "cf-ipcountry": "VN",
