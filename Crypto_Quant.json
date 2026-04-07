@@ -244,7 +244,7 @@
           "parameters": [
             {
               "name": "x-api-key",
-              "value": "LjFIv1UEdC4aCtFnLLtme6x8lDSLMGcn4202NSMH"
+              "value": "apikey"
             }
           ]
         },
